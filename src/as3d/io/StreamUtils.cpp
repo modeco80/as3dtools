@@ -7,6 +7,7 @@
 //
 
 #include "StreamUtils.hpp"
+#include <as3d/util/CommonTypes.hpp>
 
 namespace as3d::io::impl {
 
@@ -44,24 +45,13 @@ namespace as3d::io::impl {
 
 	std::string ReadPString(std::istream& is) {
 		std::string s;
-		char c;
-
 		if(!is)
 			return "";
 
-		// should be just resizing, and refactor this loop to not do this,
-		// but .... meh. I'll get to it if it's a problem
-		std::uint8_t length = is.get();
-		s.reserve(length);
-
-		while(true) {
-			c = static_cast<char>(is.get());
-
-			if(c == '\0')
-				return s;
-
-			s.push_back(c);
-		}
+		u8 length = is.get();
+		s.resize(length);
+		is.read(&s[0], length);
+		return s;
 	}
 
 } // namespace europa::io::impl

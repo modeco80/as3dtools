@@ -9,6 +9,8 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
+#include <string_view>
 
 namespace as3d {
 	using u8 = std::uint8_t;
@@ -26,4 +28,30 @@ namespace as3d {
 #define AS3D_ASSERT_TYPE_SIZE(T, Expected) \
 	static_assert(sizeof(T) == Expected, "Error: Type " #T "has wrong size, expected " #Expected ".")
 
+	namespace detail {
+
+		template<class T>
+		struct EnumToStringHelper {
+			//static std::string _() { static_assert(false, "Implement EnumToString<T>()"); }
+		};
+
+		template<class T>
+		constexpr std::string EnumToString(T t) {
+			return EnumToStringHelper<T>::_(t);
+		}
+
+		// Replace with fmt. please.
+		template<class ...Args>
+		std::string StringPrintf(const std::string_view format, Args&&... args) {
+			static char buffer[1024];
+			int len = snprintf(&buffer[0], sizeof(buffer)-1, format.data(), args...);
+			if(len == -1)
+				return "";
+			return std::string(buffer, len);
+		}
+
+	}
+
+	using detail::EnumToString;
+	using detail::StringPrintf;
 } // namespace as3d
